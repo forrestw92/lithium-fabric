@@ -1,5 +1,6 @@
 package me.jellysquid.mods.lithium.common.entity.tracker.nearby;
 
+import net.minecraft.entity.Entity;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -36,7 +37,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onEntityEnteredRange(LivingEntity entity) {
+    public void onEntityEnteredTrackedSubchunk(Entity entity) {
         if (!this.clazz.isInstance(entity)) {
             return;
         }
@@ -46,7 +47,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onEntityLeftRange(LivingEntity entity) {
+    public void onEntityLeftTrackedSubchunk(Entity entity) {
         if (this.nearby.isEmpty() || !this.clazz.isInstance(entity)) {
             return;
         }
@@ -55,7 +56,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
     }
 
     /**
-     * Gets the closest T (extends LivingEntity) to the center of this tracker that also intersects with the given box and meets the
+     * Gets the closest T (extends Entity) to the center of this tracker that also intersects with the given box and meets the
      * requirements of the targetPredicate.
      * The result may be different from vanilla if there are multiple closest entities.
      * @param box the box the entities have to intersect

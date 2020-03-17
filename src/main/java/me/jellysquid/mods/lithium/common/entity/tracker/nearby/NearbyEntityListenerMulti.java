@@ -1,6 +1,6 @@
 package me.jellysquid.mods.lithium.common.entity.tracker.nearby;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +32,16 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
     }
 
     @Override
-    public void onEntityEnteredRange(LivingEntity entity) {
+    public void onEntityEnteredTrackedSubchunk(Entity entity) {
         for (NearbyEntityListener listener : this.listeners) {
-            listener.onEntityEnteredRange(entity);
+            listener.onEntityEnteredTrackedSubchunk(entity);
         }
     }
 
     @Override
-    public void onEntityLeftRange(LivingEntity entity) {
+    public void onEntityLeftTrackedSubchunk(Entity entity) {
         for (NearbyEntityListener listener : this.listeners) {
-            listener.onEntityLeftRange(entity);
+            listener.onEntityLeftTrackedSubchunk(entity);
         }
     }
 

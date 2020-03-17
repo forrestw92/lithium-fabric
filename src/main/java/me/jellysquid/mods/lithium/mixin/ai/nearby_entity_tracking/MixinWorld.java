@@ -2,6 +2,7 @@ package me.jellysquid.mods.lithium.mixin.ai.nearby_entity_tracking;
 
 import me.jellysquid.mods.lithium.common.entity.tracker.EntityTrackerEngine;
 import me.jellysquid.mods.lithium.common.entity.tracker.WorldWithEntityTrackerEngine;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkManager;
@@ -22,7 +23,7 @@ import java.util.function.Supplier;
 @Mixin(World.class)
 public class MixinWorld implements WorldWithEntityTrackerEngine {
     private EntityTrackerEngine tracker;
-
+    private Entity currentTrackedEntity;
     /**
      * Initialize the {@link EntityTrackerEngine} which all entities of the world will interact with.
      */
@@ -34,5 +35,13 @@ public class MixinWorld implements WorldWithEntityTrackerEngine {
     @Override
     public EntityTrackerEngine getEntityTracker() {
         return this.tracker;
+    }
+
+    public boolean isEntityTrackedNow(Entity entity){
+        return this.currentTrackedEntity == entity;
+    }
+
+    public void setEntityTrackedNow(Entity entity){
+        this.currentTrackedEntity = entity;
     }
 }

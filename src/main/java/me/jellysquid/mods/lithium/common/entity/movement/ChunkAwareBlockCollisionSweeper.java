@@ -18,7 +18,13 @@ import net.minecraft.world.chunk.ChunkSection;
 
 import static me.jellysquid.mods.lithium.common.entity.LithiumEntityCollisions.EPSILON;
 
+/**
+ * ChunkAwareBlockCollisionSweeper iterates over blocks in one chunk section at a time. Together with the chunk
+ * section keeping track of the amount of oversized blocks inside the number of iterations can often be reduced.
+ */
 public class ChunkAwareBlockCollisionSweeper {
+    private static final CuboidBlockIterator EMPTY_ITERATOR = new CuboidBlockIterator(0,0,0,-1,-1,-1);
+
     private final BlockPos.Mutable mpos = new BlockPos.Mutable();
 
     /**
@@ -52,13 +58,14 @@ public class ChunkAwareBlockCollisionSweeper {
 
         this.minX = MathHelper.floor(box.x1 - EPSILON) - 1;
         this.maxX = MathHelper.floor(box.x2 + EPSILON) + 1;
-        this.minY = Math.max(0, MathHelper.floor(box.y1 - EPSILON) - 1);
-        this.maxY = Math.min(255, MathHelper.floor(box.y2 + EPSILON) + 1);
+        this.minY = MathHelper.floor(box.y1 - EPSILON) - 1;
+        this.maxY = MathHelper.floor(box.y2 + EPSILON) + 1;
         this.minZ = MathHelper.floor(box.z1 - EPSILON) - 1;
         this.maxZ = MathHelper.floor(box.z2 + EPSILON) + 1;
 
+        //initialize chunkX reduced by 1, because it will be increased in the first call of createSectionIterator
         this.chunkX = (this.minX >> 4) - 1;
-        this.chunkY = this.minY >> 4;
+        this.chunkY = MathHelper.clamp(this.minY >> 4, 0, 15);
         this.chunkZ = this.minZ >> 4;
 
         this.createSectionIterator();
@@ -71,30 +78,34 @@ public class ChunkAwareBlockCollisionSweeper {
                 this.chunkX++;
             } else {
                 this.chunkX = this.minX >> 4;
-                if (this.chunkY < (this.maxY >> 4)) {
+                if (this.chunkY < (this.maxY >> 4) && this.chunkY < 15) {
                     this.chunkY++;
                 } else {
-                    this.chunkY = this.minY >> 4;
+                    this.chunkY = MathHelper.clamp(this.minY >> 4, 0, 15);
                     if (this.chunkZ < (this.maxZ >> 4)) {
                         this.chunkZ++;
                     } else {
+                        this.chunkIt = EMPTY_ITERATOR;
                         return false;
                     }
                 }
             }
             //Casting to Chunk is not checked, together with other mods this could cause a ClassCastException
             chunk = (Chunk) this.view.getExistingChunk(this.chunkX, this.chunkZ);
+        //skip empty chunk sections
         } while (chunk == null || ChunkSection.isEmpty(this.cachedChunkSection = chunk.getSectionArray()[this.chunkY]));
 
         this.sizeDecreased = !hasChunkSectionOversizedBlocks(chunk, this.chunkY);
         int sizeReduction = !this.sizeDecreased ? 0 : 1;
+
         int startX = Math.max(this.minX + sizeReduction, this.chunkX << 4);
-        int startY = Math.max(this.minY + sizeReduction, this.chunkY << 4);
+        int startY = Math.max(0, Math.max(this.minY + sizeReduction, this.chunkY << 4));
         int startZ = Math.max(this.minZ + sizeReduction, this.chunkZ << 4);
         int endX = Math.min(this.maxX - sizeReduction, 15 + (this.chunkX << 4));
-        int endY = Math.min(this.maxY - sizeReduction, 15 + (this.chunkY << 4));
+        int endY = Math.min(255, Math.min(this.maxY - sizeReduction, 15 + (this.chunkY << 4)));
         int endZ = Math.min(this.maxZ - sizeReduction, 15 + (this.chunkZ << 4));
-        if (startX != endX && startY != endY && startZ != endZ) {
+
+        if (startX <= endX && startY <= endY && startZ <= endZ) {
             this.chunkIt = new CuboidBlockIterator(startX, startY, startZ, endX, endY, endZ);
             return true;
         }
@@ -103,7 +114,7 @@ public class ChunkAwareBlockCollisionSweeper {
     }
 
     /**
-     * Advances the sweep forward by one block, updating the return value of
+     * Advances the sweep forward until finding a block, updating the return value of
      * {@link ChunkAwareBlockCollisionSweeper#getCollidedShape()} with a block shape if the sweep collided with it.
      *
      * @return True if there are blocks left to be tested, otherwise false
@@ -111,44 +122,45 @@ public class ChunkAwareBlockCollisionSweeper {
     public boolean step() {
         this.collidedShape = null;
 
-        if (!this.chunkIt.step()) {
-            if (!this.createSectionIterator()) {
-                return false;
-            }
+        while(true) {
             if (!this.chunkIt.step()) {
-                //iterator always has at least 1 block due to size check in createSectionIterator!
-                assert false;
+                if (this.chunkIt == EMPTY_ITERATOR || !this.createSectionIterator()) {
+                    return false;
+                }
+                if (!this.chunkIt.step()) {
+                    //iterator always has at least 1 block due to size check in createSectionIterator!
+                    assert false;
+                    return false;
+                }
             }
-        }
 
-        final CuboidBlockIterator cuboidIt = this.chunkIt;
-        final int x = cuboidIt.getX();
-        final int y = cuboidIt.getY();
-        final int z = cuboidIt.getZ();
+            final CuboidBlockIterator cuboidIt = this.chunkIt;
+            final int x = cuboidIt.getX();
+            final int y = cuboidIt.getY();
+            final int z = cuboidIt.getZ();
 
-        final int edgesHit = this.sizeDecreased ? 0 :
-                            (x == this.minX || x == this.maxX ? 1 : 0) +
+            final int edgesHit = this.sizeDecreased ? 0 :
+                    (x == this.minX || x == this.maxX ? 1 : 0) +
                             (y == this.minY || y == this.maxY ? 1 : 0) +
                             (z == this.minZ || z == this.maxZ ? 1 : 0);
 
-        if (edgesHit == 3) {
-            return true;
-        }
+            if (edgesHit == 3) {
+                continue;
+            }
 
-        final BlockState state = this.cachedChunkSection.getBlockState(x & 15, y & 15, z & 15);
+            final BlockState state = this.cachedChunkSection.getBlockState(x & 15, y & 15, z & 15);
 
-        if (canInteractWithBlock(state, edgesHit)) {
-            final BlockPos.Mutable mpos = this.mpos;
-            mpos.set(x, y, z);
-            VoxelShape collisionShape = state.getCollisionShape(this.view, mpos, this.context);
+            if (canInteractWithBlock(state, edgesHit)) {
+                final BlockPos.Mutable mpos = this.mpos;
+                mpos.set(x, y, z);
+                VoxelShape collisionShape = state.getCollisionShape(this.view, mpos, this.context);
 
-            if (collisionShape != VoxelShapes.empty()) {
-                this.collidedShape = getCollidedShape(this.box, this.shape, collisionShape, x, y, z);
+                if (collisionShape != VoxelShapes.empty()) {
+                    this.collidedShape = getCollidedShape(this.box, this.shape, collisionShape, x, y, z);
+                    return true;
+                }
             }
         }
-
-        return true;
-
     }
 
     /**

@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.Shadow;
  * cache which stores the result of this complicated code path. This provides a significant speed-up in path-finding
  * code and should be relatively safe.
  */
-@SuppressWarnings("ConstantConditions")
 @Mixin(LandPathNodeMaker.class)
 public abstract class MixinLandPathNodeMaker {
     private static final PathNodeType[] NODE_TYPES = PathNodeType.values();

@@ -53,7 +53,8 @@ public class WorldHelper {
         int_2 = MathHelper.clamp(int_2, 0, entitySections.length - 1);
 
         for(int int_3 = int_1; int_3 <= int_2; ++int_3) {
-            for(Object entity_1 : ((ClassGroupFilterableList)entitySections[int_3]).getAllOfGroupType(type)) {
+            //noinspection unchecked
+            for(Object entity_1 : ((ClassGroupFilterableList<Entity>)entitySections[int_3]).getAllOfGroupType(type)) {
                 if (entity_1 != excluded && ((Entity)entity_1).getBoundingBox().intersects(box_1) && (predicate_1 == null || predicate_1.test((Entity)entity_1))) {
                     list_1.add((Entity)entity_1);
                 }

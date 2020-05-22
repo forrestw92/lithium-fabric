@@ -1,15 +1,11 @@
 package me.jellysquid.mods.lithium.mixin.entity.stream_entity_collisions_lazily;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Mixin(Entity.class)

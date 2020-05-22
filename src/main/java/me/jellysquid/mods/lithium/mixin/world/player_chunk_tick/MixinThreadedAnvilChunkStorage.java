@@ -172,6 +172,7 @@ public abstract class MixinThreadedAnvilChunkStorage {
     /**
      * Returns a prepared packet array for use with {@link ThreadedAnvilChunkStorage#sendWatchPackets(ServerPlayerEntity, ChunkPos, Packet[], boolean, boolean)}.
      */
+    @SuppressWarnings("JavadocReference")
     private Packet<?>[] getCachedWatchPacketsArray() {
         Arrays.fill(this.cachedWatchPackets, null);
 

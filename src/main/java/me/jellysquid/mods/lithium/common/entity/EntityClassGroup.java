@@ -60,36 +60,15 @@ public class EntityClassGroup {
     private final ConcurrentHashMap<Class<?>, Object> classGroup; //value unused, no set variant available
     private final Function<Class<?>, Boolean> classFitEvaluator;
 
-    public EntityClassGroup() {
-        this.classGroup = new ConcurrentHashMap<>();
-        EntityClassGroup.entityClassGroups.add(this);
-        this.classFitEvaluator = null;
-
-    }
     public EntityClassGroup(Function<Class<?>, Boolean> classFitEvaluator) {
         this.classGroup = new ConcurrentHashMap<>();
         EntityClassGroup.entityClassGroups.add(this);
         this.classFitEvaluator = classFitEvaluator;
     }
-    public EntityClassGroup(Collection<Class<? >> classGroupCollection, Function<Class<?>, Boolean> classFitEvaluator) {
-        this(classFitEvaluator);
-        for (Class<?> cl : classGroupCollection) {
-            this.classGroup.put(cl, cl);
-        }
-    }
-
-    public EntityClassGroup add(Class<?> entityClass) {
-        this.classGroup.put(entityClass, entityClass);
-        return this;
-    }
 
     public boolean contains(Class<?> entityClass) {
         EntityClassGroup.analyseEntityClass(entityClass);
         return this.classGroup.containsKey(entityClass);
-    }
-
-    public Collection<Class<?>> getCollection() {
-        return this.classGroup.keySet();
     }
 
     public void addClassIfFitting(Class<?> discoveredEntityClass) {

@@ -61,7 +61,7 @@ public abstract class MixinTypeFilterableList<T> implements ClassGroupFilterable
         for (Map.Entry<Object, ReferenceLinkedOpenHashSet<T>> entityGroupAndMap : this.entitiesByGroup.entrySet()) {
             Object entityGroup = entityGroupAndMap.getKey();
             if (entityGroup instanceof Class) {
-                if (((Class)entityGroup).isInstance(entity)) {
+                if (((Class<?>)entityGroup).isInstance(entity)) {
                     entityGroupAndMap.getValue().add(entity);
                     bl = true;
                 }
@@ -84,7 +84,8 @@ public abstract class MixinTypeFilterableList<T> implements ClassGroupFilterable
         boolean bl = false;
 
         for (Map.Entry<Object, ReferenceLinkedOpenHashSet<T>> objectReferenceLinkedOpenHashSetEntry : this.entitiesByGroup.entrySet()) {
-            bl |= objectReferenceLinkedOpenHashSetEntry.getValue().remove((T) o);
+            //noinspection SuspiciousMethodCalls
+            bl |= objectReferenceLinkedOpenHashSetEntry.getValue().remove(o);
         }
 
         return bl;
@@ -119,15 +120,15 @@ public abstract class MixinTypeFilterableList<T> implements ClassGroupFilterable
     }
 
     @Redirect(method = "iterator", at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"))
-    private boolean isEmpty(List list) {
+    private boolean isEmpty(List<?> list) {
         return this.allEntities.isEmpty();
     }
     @Redirect(method = "iterator", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
-    private Iterator<T> iterator(List list) {
+    private Iterator<T> iterator(List<?> list) {
         return this.allEntities.iterator();
     }
     @Redirect(method = "size", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    private int size(List list) {
+    private int size(List<?> list) {
         return this.allEntities.size();
     }
 

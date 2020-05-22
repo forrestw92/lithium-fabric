@@ -12,7 +12,7 @@ import java.util.List;
 import static net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR;
 
 public class EntityClassGroupHelper {
-    //check if the mixin of typefilterablelist is loaded, otherwise don't use it
+    //check if the mixin of TypeFilterableList is loaded, otherwise don't use it
     public interface MixinLoadTest {}
     public static final boolean CUSTOM_TYPE_FILTERABLE_LIST_DISABLED = !MixinLoadTest.class.isAssignableFrom(TypeFilterableList.class);
 
@@ -36,9 +36,4 @@ public class EntityClassGroupHelper {
             return WorldHelper.getEntitiesOfClassGroup((World)entityView, entity, EntityClassGroup.COLLISION_BOX_OVERRIDE, selection, EXCEPT_SPECTATOR);
         }
     }
-
-    /**
-     * Interface to group entity types that don't always return null on getCollisionBox.
-     */
-    public interface CollisionBoxOverridingEntity {}
 }

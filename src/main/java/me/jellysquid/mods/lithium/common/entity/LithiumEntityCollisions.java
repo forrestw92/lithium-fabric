@@ -1,6 +1,6 @@
 package me.jellysquid.mods.lithium.common.entity;
 
-import me.jellysquid.mods.lithium.common.entity.movement.BlockCollisionSweeper;
+import me.jellysquid.mods.lithium.common.entity.movement.ChunkAwareBlockCollisionSweeper;
 import me.jellysquid.mods.lithium.common.util.Producer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Box;
@@ -32,7 +32,7 @@ public class LithiumEntityCollisions {
             return Stream.empty();
         }
 
-        final BlockCollisionSweeper sweeper = new BlockCollisionSweeper(world, entity, box);
+        final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
 
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<VoxelShape>(Long.MAX_VALUE, Spliterator.NONNULL | Spliterator.IMMUTABLE) {
             private boolean skipWorldBorderCheck = entity == null;
@@ -74,7 +74,7 @@ public class LithiumEntityCollisions {
             return false;
         }
 
-        final BlockCollisionSweeper sweeper = new BlockCollisionSweeper(world, entity, box);
+        final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
 
         while (sweeper.step()) {
             if (sweeper.getCollidedShape() != null) {

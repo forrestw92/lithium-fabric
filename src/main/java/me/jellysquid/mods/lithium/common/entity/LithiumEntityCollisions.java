@@ -49,14 +49,10 @@ public class LithiumEntityCollisions {
                     }
                 }
 
-                while (sweeper.step()) {
-                    VoxelShape shape = sweeper.getCollidedShape();
-
-                    if (shape != null) {
-                        consumer.accept(shape);
-
-                        return true;
-                    }
+                VoxelShape shape = sweeper.step();
+                if (shape != null) {
+                    consumer.accept(shape);
+                    return true;
                 }
 
                 return false;
@@ -76,13 +72,8 @@ public class LithiumEntityCollisions {
 
         final ChunkAwareBlockCollisionSweeper sweeper = new ChunkAwareBlockCollisionSweeper(world, entity, box);
 
-        while (sweeper.step()) {
-            if (sweeper.getCollidedShape() != null) {
-                return true;
-            }
-        }
-
-        return false;
+        VoxelShape shape = sweeper.step();
+        return shape != null;
     }
 
     /**

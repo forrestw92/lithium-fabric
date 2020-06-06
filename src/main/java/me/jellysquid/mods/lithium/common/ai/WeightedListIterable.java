@@ -1,7 +1,7 @@
 package me.jellysquid.mods.lithium.common.ai;
 
 import net.minecraft.util.collection.WeightedList;
-
+import net.minecraft.util.collection.WeightedList.Entry;
 import java.util.Iterator;
 
 public interface WeightedListIterable<U> extends Iterable<U> {
@@ -26,9 +26,9 @@ public interface WeightedListIterable<U> extends Iterable<U> {
      * @param <U> The value type stored in each list entry
      */
     class ListIterator<U> implements Iterator<U> {
-        private final Iterator<WeightedList<U>.Entry<? extends U>> inner;
+        private final Iterator<WeightedList.Entry<? extends U>> inner;
 
-        public ListIterator(Iterator<WeightedList<U>.Entry<? extends U>> inner) {
+        public ListIterator(Iterator<WeightedList.Entry<? extends U>> inner) {
             this.inner = inner;
         }
 

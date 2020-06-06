@@ -1,10 +1,7 @@
 package me.jellysquid.mods.lithium.mixin.world.chunk_access;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.CollisionView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -20,10 +17,6 @@ import org.spongepowered.asm.mixin.Shadow;
  */
 @Mixin(World.class)
 public abstract class MixinWorld implements WorldView, CollisionView {
-    @Shadow
-    @Final
-    protected ChunkManager chunkManager;
-
     /**
      * @reason Remove dynamic-dispatch and inline call
      * @author JellySquid
@@ -59,7 +52,8 @@ public abstract class MixinWorld implements WorldView, CollisionView {
     }
 
     private Chunk getChunkLithium(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
-        Chunk chunk = this.chunkManager.getChunk(chunkX, chunkZ, leastStatus, create);
+        //todo think about caching getChunkManager in a field
+        Chunk chunk = ((WorldAccess)this).getChunkManager().getChunk(chunkX, chunkZ, leastStatus, create);
 
         if (chunk == null && create) {
             throw new IllegalStateException("Should always be able to create a chunk!");

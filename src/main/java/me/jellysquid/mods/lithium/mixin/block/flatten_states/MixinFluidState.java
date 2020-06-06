@@ -1,11 +1,12 @@
 package me.jellysquid.mods.lithium.mixin.block.flatten_states;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.FluidStateImpl;
 import net.minecraft.state.property.Property;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,38 +19,62 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Since these are constant for any given fluid state, we can cache them nearby for improved performance and eliminate
  * the overhead.
  */
-@Mixin(FluidStateImpl.class)
-public abstract class MixinFluidStateImpl implements FluidState {
+@Mixin(FluidState.class)
+public abstract class MixinFluidState{
     private float height;
     private int level;
     private boolean isEmpty;
     private boolean isStill;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Fluid fluid, ImmutableMap<Property<?>, Comparable<?>> properties, CallbackInfo ci) {
+    private void init(Fluid fluid, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<FluidState> mapCodec, CallbackInfo ci) {
         this.isEmpty = fluid.isEmpty();
 
-        this.level = fluid.getLevel(this);
-        this.height = fluid.getHeight(this);
-        this.isStill = fluid.isStill(this);
+        this.level = fluid.getLevel((FluidState)(Object)this);
+        this.height = fluid.getHeight((FluidState)(Object)this);
+        this.isStill = fluid.isStill((FluidState)(Object)this);
     }
 
-    @Override
+    /**
+     * @author JellySquid
+     * modified by 2No2Name during 1.16 pre2 port
+     *
+     * @reason trying to be faster
+     */
+    @Overwrite
     public boolean isStill() {
         return this.isStill;
     }
 
-    @Override
+    /**
+     * @author JellySquid
+     * modified by 2No2Name during 1.16 pre2 port
+     *
+     * @reason trying to be faster
+     */
+    @Overwrite
     public boolean isEmpty() {
         return this.isEmpty;
     }
 
-    @Override
+    /**
+     * @author JellySquid
+     * modified by 2No2Name during 1.16 pre2 port
+     *
+     * @reason trying to be faster
+     */
+    @Overwrite
     public float getHeight() {
         return this.height;
     }
 
-    @Override
+    /**
+     * @author JellySquid
+     * modified by 2No2Name during 1.16 pre2 port
+     *
+     * @reason trying to be faster
+     */
+    @Overwrite
     public int getLevel() {
         return this.level;
     }

@@ -131,9 +131,9 @@ public abstract class MixinLandPathNodeMaker {
         // Retrieve the fluid state from the block state to avoid a second lookup
         FluidState fluid = blockState.getFluidState();
 
-        if (fluid.matches(FluidTags.WATER)) {
+        if (fluid.isIn(FluidTags.WATER)) {
             return PathNodeType.WATER;
-        } else if (fluid.matches(FluidTags.LAVA)) {
+        } else if (fluid.isIn(FluidTags.LAVA)) {
             return PathNodeType.LAVA;
         }
 

@@ -23,10 +23,10 @@ public class WorldHelper {
      */
     public static List<Entity> getEntitiesOfClassGroup(World world, Entity excluded, EntityClassGroup type, Box box_1, Predicate<Entity> predicate_1) {
         world.getProfiler().visit("getEntities");
-        int int_1 = MathHelper.floor((box_1.x1 - 2.0D) / 16.0D);
-        int int_2 = MathHelper.ceil((box_1.x2 + 2.0D) / 16.0D);
-        int int_3 = MathHelper.floor((box_1.z1 - 2.0D) / 16.0D);
-        int int_4 = MathHelper.ceil((box_1.z2 + 2.0D) / 16.0D);
+        int int_1 = MathHelper.floor((box_1.minX - 2.0D) / 16.0D);
+        int int_2 = MathHelper.ceil((box_1.maxX + 2.0D) / 16.0D);
+        int int_3 = MathHelper.floor((box_1.minZ - 2.0D) / 16.0D);
+        int int_4 = MathHelper.ceil((box_1.maxZ + 2.0D) / 16.0D);
         List<Entity> list_1 = Lists.newArrayList();
         ChunkManager chunkManager_1 = world.getChunkManager();
 
@@ -47,8 +47,8 @@ public class WorldHelper {
      */
     public static void getEntitiesOfClassGroup(WorldChunk worldChunk, Entity excluded, EntityClassGroup type, Box box_1, List<Entity> list_1, Predicate<Entity> predicate_1) {
         TypeFilterableList<Entity>[] entitySections = worldChunk.getEntitySectionArray();
-        int int_1 = MathHelper.floor((box_1.y1 - 2.0D) / 16.0D);
-        int int_2 = MathHelper.floor((box_1.y2 + 2.0D) / 16.0D);
+        int int_1 = MathHelper.floor((box_1.minY - 2.0D) / 16.0D);
+        int int_2 = MathHelper.floor((box_1.maxY + 2.0D) / 16.0D);
         int_1 = MathHelper.clamp(int_1, 0, entitySections.length - 1);
         int_2 = MathHelper.clamp(int_2, 0, entitySections.length - 1);
 
@@ -68,10 +68,10 @@ public class WorldHelper {
      */
     public static List<Entity> getEntitiesOfClass(World world, Entity except, Class<? extends Entity> entityClass, Box box) {
         world.getProfiler().visit("getEntities");
-        int chunkX1 = MathHelper.floor((box.x1 - 2.0D) / 16.0D);
-        int chunkX2 = MathHelper.ceil((box.x2 + 2.0D) / 16.0D);
-        int chunkZ1 = MathHelper.floor((box.z1 - 2.0D) / 16.0D);
-        int chunkZ2 = MathHelper.ceil((box.z2 + 2.0D) / 16.0D);
+        int chunkX1 = MathHelper.floor((box.minX - 2.0D) / 16.0D);
+        int chunkX2 = MathHelper.ceil((box.maxX + 2.0D) / 16.0D);
+        int chunkZ1 = MathHelper.floor((box.minZ - 2.0D) / 16.0D);
+        int chunkZ2 = MathHelper.ceil((box.maxZ + 2.0D) / 16.0D);
         List<Entity> entityList = Lists.newArrayList();
         ChunkManager chunkManager = world.getChunkManager();
 
@@ -92,8 +92,8 @@ public class WorldHelper {
      */
     private static void getEntitiesOfClass(WorldChunk worldChunk, Entity excluded, Class<? extends Entity> entityClass, Box box, List<Entity> entityList) {
         TypeFilterableList<Entity>[] entitySections = worldChunk.getEntitySectionArray();
-        int chunkY1 = MathHelper.floor((box.y1 - 2.0D) / 16.0D);
-        int chunkY2 = MathHelper.floor((box.y2 + 2.0D) / 16.0D);
+        int chunkY1 = MathHelper.floor((box.minY - 2.0D) / 16.0D);
+        int chunkY2 = MathHelper.floor((box.maxY + 2.0D) / 16.0D);
         chunkY1 = MathHelper.clamp(chunkY1, 0, entitySections.length - 1);
         chunkY2 = MathHelper.clamp(chunkY2, 0, entitySections.length - 1);
 

@@ -30,9 +30,9 @@ public class MixinVoxelShapes {
             return;
         }
         //here the movement axis must be Axis.Y, and the movement is negative / downwards
-        int x = MathHelper.floor((box.x1 + box.x2) / 2);
-        int y = MathHelper.ceil(box.y1) - 1;
-        int z = MathHelper.floor((box.z1 + box.z2) / 2);
+        int x = MathHelper.floor((box.minX + box.maxX) / 2);
+        int y = MathHelper.ceil(box.minY) - 1;
+        int z = MathHelper.floor((box.minZ + box.maxZ) / 2);
         BlockPos pos = new BlockPos(x,y,z);
         //[VanillaCopy] collide with the block below the center of the box exactly like vanilla does during block iteration
         BlockState blockState = world.getBlockState(pos);

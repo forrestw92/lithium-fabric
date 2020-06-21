@@ -58,12 +58,12 @@ public class ChunkAwareBlockCollisionSweeper {
         this.context = entity == null ? ShapeContext.absent() : ShapeContext.of(entity);
         this.view = view;
 
-        this.minX = MathHelper.floor(box.x1 - EPSILON);
-        this.maxX = MathHelper.floor(box.x2 + EPSILON);
-        this.minY = MathHelper.clamp((int)(box.y1 - EPSILON),0,255);
-        this.maxY = MathHelper.clamp((int)(box.y2 + EPSILON),0,255);
-        this.minZ = MathHelper.floor(box.z1 - EPSILON);
-        this.maxZ = MathHelper.floor(box.z2 + EPSILON);
+        this.minX = MathHelper.floor(box.minX - EPSILON);
+        this.maxX = MathHelper.floor(box.maxX + EPSILON);
+        this.minY = MathHelper.clamp((int)(box.minY - EPSILON),0,255);
+        this.maxY = MathHelper.clamp((int)(box.maxY + EPSILON),0,255);
+        this.minZ = MathHelper.floor(box.minZ - EPSILON);
+        this.maxZ = MathHelper.floor(box.maxZ + EPSILON);
 
         this.chunkX = (this.minX - 1) >> 4;
         this.chunkZ = (this.minZ - 1) >> 4;

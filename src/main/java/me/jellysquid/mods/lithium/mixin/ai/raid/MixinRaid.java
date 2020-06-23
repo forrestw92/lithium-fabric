@@ -1,7 +1,7 @@
 package me.jellysquid.mods.lithium.mixin.ai.raid;
 
 import net.minecraft.entity.boss.ServerBossBar;
-import net.minecraft.entity.raid.Raid;
+import net.minecraft.village.raid.Raid;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

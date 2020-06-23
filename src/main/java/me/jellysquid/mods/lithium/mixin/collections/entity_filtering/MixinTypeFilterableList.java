@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import me.jellysquid.mods.lithium.common.entity.EntityClassGroup;
 import me.jellysquid.mods.lithium.common.entity.EntityClassGroupHelper;
+import me.jellysquid.mods.lithium.common.util.collections.CollectionFakeList;
 import me.jellysquid.mods.lithium.common.world.chunk.ClassGroupFilterableList;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.collection.TypeFilterableList;
@@ -167,5 +168,16 @@ public abstract class MixinTypeFilterableList<T> implements ClassGroupFilterable
         this.entitiesByGroupUnmodifiables.put(type, allOfTypeUnmodifiable);
 
         return allOfTypeUnmodifiable;
+    }
+
+    /**
+     * Sadly have to wrap it in a list type
+     * @return our entity collection as list
+     * @author 2No2Name
+     * @reason Provide our collection instead of the now unused collection from vanilla.
+     */
+    @Overwrite
+    public List<T> method_29903() {
+        return new CollectionFakeList<>(this.entitiesByGroupUnmodifiables.get(this.elementType));
     }
 }

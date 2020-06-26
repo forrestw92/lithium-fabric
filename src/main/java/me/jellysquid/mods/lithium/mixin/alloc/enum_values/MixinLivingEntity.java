@@ -13,7 +13,7 @@ public class MixinLivingEntity {
     /**
      * @reason Avoid cloning enum values
      */
-    @Redirect(method = {"tick", "writeCustomDataToTag"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EquipmentSlot;values()[Lnet/minecraft/entity/EquipmentSlot;"))
+    @Redirect(method = "method_30129", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EquipmentSlot;values()[Lnet/minecraft/entity/EquipmentSlot;"))
     private EquipmentSlot[] redirectEquipmentSlotsClone() {
         return SLOTS;
     }

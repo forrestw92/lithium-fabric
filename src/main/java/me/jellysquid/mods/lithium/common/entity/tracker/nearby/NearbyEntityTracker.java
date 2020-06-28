@@ -2,6 +2,7 @@ package me.jellysquid.mods.lithium.common.entity.tracker.nearby;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import me.jellysquid.mods.lithium.common.util.LithiumMath;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.util.math.Box;
@@ -36,7 +37,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onEntityEnteredRange(LivingEntity entity) {
+    public void onEntityEnteredTrackedSubchunk(Entity entity) {
         if (!this.clazz.isInstance(entity)) {
             return;
         }
@@ -46,7 +47,7 @@ public class NearbyEntityTracker<T extends LivingEntity> implements NearbyEntity
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onEntityLeftRange(LivingEntity entity) {
+    public void onEntityLeftTrackedSubchunk(Entity entity) {
         if (this.nearby.isEmpty() || !this.clazz.isInstance(entity)) {
             return;
         }

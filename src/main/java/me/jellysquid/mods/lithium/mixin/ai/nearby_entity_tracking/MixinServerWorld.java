@@ -3,7 +3,6 @@ package me.jellysquid.mods.lithium.mixin.ai.nearby_entity_tracking;
 import me.jellysquid.mods.lithium.common.entity.tracker.EntityTrackerEngine;
 import me.jellysquid.mods.lithium.common.entity.tracker.EntityTrackerEngineProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,21 +15,71 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  */
 @Mixin(ServerWorld.class)
 public class MixinServerWorld {
+
+    //begin author 2No2Name
+    //code used in MixinServerWorld and MixinClientWorld
+    //Used for detecting whether an entity moved. Variables can be used for both normal and riding entities.
+    private double entityPrevX,entityPrevY,entityPrevZ;
+    /**
+     * Prepare notifying the entity tracker when an entity moves (used for within chunk section tracking).
+     */
+    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.BEFORE))
+    private void rememberCoords(Entity entity, CallbackInfo ci){
+        this.entityPrevX = entity.getX();
+        this.entityPrevY = entity.getY();
+        this.entityPrevZ = entity.getZ();
+        ((EntityTrackerEngineProvider)this).setEntityTrackedNow(entity);
+    }
+    /**
+     * Prepare notifying the entity tracker when an entity moves (used for within chunk section tracking).
+     * (call for entities riding a vehicle)
+     */
+    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.BEFORE))
+    private void rememberCoords_RidingEntity(Entity vehicle, Entity entityRiding, CallbackInfo ci){
+        this.entityPrevX = entityRiding.getX();
+        this.entityPrevY = entityRiding.getY();
+        this.entityPrevZ = entityRiding.getZ();
+        ((EntityTrackerEngineProvider)this).setEntityTrackedNow(entityRiding);
+    }
+    /**
+     * Notify the entity tracker when an entity moves (used for within chunk section tracking).
+     */
+    @Inject(method = "tickEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tick()V", shift = At.Shift.AFTER))
+    private void notifyEntityTracker(Entity entity, CallbackInfo ci){
+        if(this.entityPrevX != entity.getX() || this.entityPrevY != entity.getY() || this.entityPrevZ != entity.getZ()) {
+            EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
+            tracker.onEntityMovedAnyDistance(entity);
+        }
+        ((EntityTrackerEngineProvider)this).setEntityTrackedNow(null);
+    }
+    /**
+     * Notify the entity tracker when an entity moves (used for within chunk section tracking).
+     * (call for entities riding a vehicle)
+     */
+    @Inject(method = "tickPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;tickRiding()V", shift = At.Shift.AFTER))
+    private void notifyEntityTracker_RidingEntity(Entity vehicle, Entity entityRiding, CallbackInfo ci){
+        if(this.entityPrevX != entityRiding.getX() || this.entityPrevY != entityRiding.getY() || this.entityPrevZ != entityRiding.getZ()) {
+            EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
+            tracker.onEntityMovedAnyDistance(entityRiding);
+        }
+        ((EntityTrackerEngineProvider)this).setEntityTrackedNow(null);
+    }
+    //end Author 2No2Name
+
+
+
+
     /**
      * Notify the entity tracker when an entity moves and enters a new chunk.
      */
     @Inject(method = "checkChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;addEntity(Lnet/minecraft/entity/Entity;)V", shift = At.Shift.BEFORE))
     private void onEntityMoveAdd(Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof LivingEntity)) {
-            return;
-        }
-
         int x = MathHelper.floor(entity.getX()) >> 4;
         int y = MathHelper.floor(entity.getY()) >> 4;
         int z = MathHelper.floor(entity.getZ()) >> 4;
 
         EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
-        tracker.onEntityAdded(x, y, z, (LivingEntity) entity);
+        tracker.onEntityAdded(x, y, z, entity);
 
     }
 
@@ -39,12 +88,8 @@ public class MixinServerWorld {
      */
     @Inject(method = "checkChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/WorldChunk;remove(Lnet/minecraft/entity/Entity;I)V", shift = At.Shift.BEFORE))
     private void onEntityMoveRemove(Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof LivingEntity)) {
-            return;
-        }
-
         EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
-        tracker.onEntityRemoved(entity.chunkX, entity.chunkY, entity.chunkZ, (LivingEntity) entity);
+        tracker.onEntityRemoved(entity.chunkX, entity.chunkY, entity.chunkZ, entity);
     }
 
     /**
@@ -52,16 +97,12 @@ public class MixinServerWorld {
      */
     @Inject(method = "loadEntityUnchecked", at = @At(value = "FIELD", target = "Lnet/minecraft/server/world/ServerWorld;entitiesById:Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;"))
     private void onEntityAdded(Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof LivingEntity)) {
-            return;
-        }
-
         int chunkX = MathHelper.floor(entity.getX()) >> 4;
         int chunkY = MathHelper.floor(entity.getY()) >> 4;
         int chunkZ = MathHelper.floor(entity.getZ()) >> 4;
 
         EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
-        tracker.onEntityAdded(chunkX, chunkY, chunkZ, (LivingEntity) entity);
+        tracker.onEntityAdded(chunkX, chunkY, chunkZ, entity);
     }
 
     /**
@@ -69,15 +110,11 @@ public class MixinServerWorld {
      */
     @Inject(method = "unloadEntity", at = @At(value = "HEAD"))
     private void onEntityRemoved(Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof LivingEntity)) {
-            return;
-        }
-
         int chunkX = MathHelper.floor(entity.getX()) >> 4;
         int chunkY = MathHelper.floor(entity.getY()) >> 4;
         int chunkZ = MathHelper.floor(entity.getZ()) >> 4;
 
         EntityTrackerEngine tracker = EntityTrackerEngineProvider.getEntityTracker(this);
-        tracker.onEntityRemoved(chunkX, chunkY, chunkZ, (LivingEntity) entity);
+        tracker.onEntityRemoved(chunkX, chunkY, chunkZ, entity);
     }
 }

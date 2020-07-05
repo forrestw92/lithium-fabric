@@ -23,7 +23,7 @@ public class LithiumConfig {
 
     private LithiumConfig() {
         this.addDefaultMixinOption("chunk.no_locking", false);
-        this.addDefaultMixinOption("shapes.specialized_shapes", false);
+//        this.addDefaultMixinOption("shapes.specialized_shapes", false);
     }
 
     private void addDefaultMixinOption(String mixin, boolean enabled) {

@@ -1,7 +1,6 @@
 package me.jellysquid.mods.lithium.common.entity.tracker.nearby;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import me.jellysquid.mods.lithium.common.util.LithiumMath;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;

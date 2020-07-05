@@ -1,6 +1,6 @@
 package me.jellysquid.mods.lithium.common.entity.movement;
 
-import me.jellysquid.mods.lithium.common.shapes.VoxelShapeExtended;
+import me.jellysquid.mods.lithium.common.shapes.VoxelShapeCaster;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ShapeContext;
@@ -174,7 +174,7 @@ public class ChunkAwareBlockCollisionSweeper {
 
             if (canInteractWithBlock(state, edgesHit)) {
                 this.pos.set(x, y, z);
-                VoxelShape collisionShape = state.getCollisionShape(this.view, this.pos, this.context);
+                VoxelShape collisionShape = CollisionShapeGetter.getCollisionShape(state, this.view, this.pos, this.context);
 
                 if (collisionShape != VoxelShapes.empty()) {
                     VoxelShape collidedShape = getCollidedShape(this.box, this.shape, collisionShape, x, y, z);
@@ -204,8 +204,8 @@ public class ChunkAwareBlockCollisionSweeper {
      * @return A {@link VoxelShape} which contains the shape representing that which was collided with, otherwise null
      */
     private static VoxelShape getCollidedShape(Box entityBox, VoxelShape entityShape, VoxelShape shape, int x, int y, int z) {
-        if (shape instanceof VoxelShapeExtended) {
-            if (((VoxelShapeExtended) shape).intersects(entityBox, x, y, z)) {
+        if (shape instanceof VoxelShapeCaster) {
+            if (((VoxelShapeCaster) shape).intersects(entityBox, x, y, z)) {
                 return shape.offset(x, y, z);
             } else {
                 return null;

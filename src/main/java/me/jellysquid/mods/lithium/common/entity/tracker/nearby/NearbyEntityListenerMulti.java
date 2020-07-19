@@ -45,4 +45,15 @@ public class NearbyEntityListenerMulti implements NearbyEntityListener {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sublisteners = new StringBuilder();
+        String comma = "";
+        for (NearbyEntityListener listener : listeners) {
+            comma = ","; //trick to drop the first comma
+            sublisteners.append(listener.toString()).append(comma);
+        }
+
+        return super.toString() + " with sublisteners: [" + sublisteners + "]";
+    }
 }

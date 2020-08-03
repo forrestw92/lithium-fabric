@@ -68,7 +68,7 @@ public abstract class FindEntityTaskMixin<E extends LivingEntity, T extends Livi
      * @author Maity
      */
     @Overwrite
-    protected void run(ServerWorld world, E self, long time) {
+    public void run(ServerWorld world, E self, long time) {
         Brain<?> brain = self.getBrain();
 
         List<LivingEntity> visibleMobs = brain.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS)

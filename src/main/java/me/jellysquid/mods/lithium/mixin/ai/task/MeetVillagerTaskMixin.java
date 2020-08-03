@@ -24,7 +24,7 @@ public class MeetVillagerTaskMixin {
      * @author Maity
      */
     @Overwrite
-    protected boolean shouldRun(ServerWorld world, LivingEntity entity) {
+    public boolean shouldRun(ServerWorld world, LivingEntity entity) {
         Brain<?> brain = entity.getBrain();
 
         Optional<GlobalPos> optional = brain.getOptionalMemory(MemoryModuleType.MEETING_POINT);
@@ -50,7 +50,7 @@ public class MeetVillagerTaskMixin {
      * @author Maity
      */
     @Overwrite
-    protected void run(ServerWorld world, LivingEntity entity, long time) {
+    public void run(ServerWorld world, LivingEntity entity, long time) {
         Brain<?> brain = entity.getBrain();
 
         List<LivingEntity> visibleMobs = brain.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS)

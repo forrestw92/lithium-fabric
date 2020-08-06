@@ -57,8 +57,9 @@ public class FollowMobTaskMixin {
                 .orElse(Collections.emptyList());
 
         for (LivingEntity mob : visibleMobs) {
-            if (mob.squaredDistanceTo(entity) <= (double) this.maxDistanceSquared) {
+            if (this.predicate.test(mob) && mob.squaredDistanceTo(entity) <= (double) this.maxDistanceSquared) {
                 brain.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(mob, true));
+                return;
             }
         };
     }

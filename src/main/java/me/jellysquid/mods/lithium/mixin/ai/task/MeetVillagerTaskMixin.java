@@ -30,15 +30,17 @@ public class MeetVillagerTaskMixin {
         Optional<GlobalPos> optional = brain.getOptionalMemory(MemoryModuleType.MEETING_POINT);
 
         // [VanillaCopy]
-        if (optional.isPresent() && world.getRandom().nextInt(100) == 0
-                && world.getRegistryKey() == optional.get().getDimension()
+        if (world.getRandom().nextInt(100) == 0
+                && optional.isPresent() && world.getRegistryKey() == optional.get().getDimension()
                 && optional.get().getPos().isWithinDistance(entity.getPos(), 4.0D)) {
 
             List<LivingEntity> visibleMobs = brain.getOptionalMemory(MemoryModuleType.VISIBLE_MOBS)
                     .orElse(Collections.emptyList());
 
             for (LivingEntity mob : visibleMobs) {
-                return EntityType.VILLAGER.equals(mob.getType());
+                if (EntityType.VILLAGER.equals(mob.getType())) {
+                    return true;
+                }
             }
         }
 
@@ -66,6 +68,7 @@ public class MeetVillagerTaskMixin {
                 brain.remember(MemoryModuleType.INTERACTION_TARGET, mob);
                 brain.remember(MemoryModuleType.LOOK_TARGET, new EntityLookTarget(mob, true));
                 brain.remember(MemoryModuleType.WALK_TARGET, new WalkTarget(new EntityLookTarget(mob, false), 0.3F, 1));
+                return;
             }
         }
     }

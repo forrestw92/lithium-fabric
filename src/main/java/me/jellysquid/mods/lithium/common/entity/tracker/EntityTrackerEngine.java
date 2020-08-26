@@ -80,7 +80,7 @@ public class EntityTrackerEngine {
 
     private boolean removeEntity(int x, int y, int z, LivingEntity entity) {
         if (!this.allEntities.containsKey(entity) || this.allEntities.getLong(entity) != encode(x,y,z)) {
-            errorWrongRemove(entity, x, y, z);
+            errorWrongRemove(entity, x, y, z, ChunkSectionPos.from(this.allEntities.getLong(entity)));
         } else {
             this.allEntities.removeLong(entity);
         }
@@ -293,12 +293,14 @@ public class EntityTrackerEngine {
                 "but already added at: " + oldPos.toString();
         throw new IllegalStateException(message);
     }
-    private static void errorWrongRemove(LivingEntity entity, int x, int y, int z) {
+    private static void errorWrongRemove(LivingEntity entity, int x, int y, int z, ChunkSectionPos oldPos) {
         String message = "Removing Entity: " + entityToErrorString(entity) +
                 "\n" +
                 "at chunk pos: " + ChunkSectionPos.from(x, y, z).toString() +
                 "\n" +
-                "but wasn't registered there! ";
+                "but wasn't registered there!" +
+                "\n" +
+                (oldPos == null ? "was not registered in the EntityTrackerEngine." : "was registered at: " + oldPos.toString());
         throw new IllegalStateException(message);
     }
 

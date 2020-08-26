@@ -1,16 +1,20 @@
 package me.jellysquid.mods.lithium.common.entity.tracker;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import me.jellysquid.mods.lithium.common.entity.tracker.nearby.NearbyEntityListener;
 import me.jellysquid.mods.lithium.common.entity.tracker.nearby.NearbyEntityListenerProvider;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Tracks the entities within a world and provides notifications to listeners when a tracked entity enters or leaves a
@@ -21,10 +25,13 @@ public class EntityTrackerEngine {
     private final Long2ObjectOpenHashMap<TrackedEntityList> sections;
     private final Reference2ReferenceOpenHashMap<NearbyEntityListener, List<TrackedEntityList>> sectionsByEntity;
 
+    private final Reference2LongOpenHashMap<Entity> allEntities;
+
 
     public EntityTrackerEngine() {
         this.sections = new Long2ObjectOpenHashMap<>();
         this.sectionsByEntity = new Reference2ReferenceOpenHashMap<>();
+        this.allEntities = new Reference2LongOpenHashMap<>();
     }
 
     /**
@@ -62,10 +69,22 @@ public class EntityTrackerEngine {
     }
 
     private boolean addEntity(int x, int y, int z, LivingEntity entity) {
+        if (this.allEntities.containsKey(entity)) {
+            errorDoubleAdd(entity, x, y, z, ChunkSectionPos.from(this.allEntities.getLong(entity)));
+        } else {
+            this.allEntities.put(entity, encode(x,y,z));
+        }
+
         return this.getOrCreateList(x, y, z).addTrackedEntity(entity);
     }
 
     private boolean removeEntity(int x, int y, int z, LivingEntity entity) {
+        if (!this.allEntities.containsKey(entity) || this.allEntities.getLong(entity) != encode(x,y,z)) {
+            errorWrongRemove(entity, x, y, z);
+        } else {
+            this.allEntities.removeLong(entity);
+        }
+
         TrackedEntityList list = this.getList(x, y, z);
 
         if (list == null) {
@@ -83,8 +102,7 @@ public class EntityTrackerEngine {
         }
 
         if (this.sectionsByEntity.containsKey(listener)) {
-
-            throw new IllegalStateException(errorMessageAlreadyListening(this.sectionsByEntity, listener, ChunkSectionPos.from(x,y,z)));
+            errorMessageAlreadyListening(this.sectionsByEntity, listener, ChunkSectionPos.from(x,y,z));
         }
 
         int yMin = Math.max(0, y - r);
@@ -221,7 +239,11 @@ public class EntityTrackerEngine {
                 listener.onEntityEnteredRange(entity);
             }
 
-            return this.entities.add(entity);
+            final boolean addSuccess = this.entities.add(entity);
+            if(!addSuccess) {
+
+            }
+            return addSuccess;
         }
 
         public boolean removeTrackedEntity(LivingEntity entity) {
@@ -246,24 +268,42 @@ public class EntityTrackerEngine {
     }
 
 
-    private static String errorMessageAlreadyListening(Reference2ReferenceOpenHashMap<NearbyEntityListener, List<TrackedEntityList>> sectionsByEntity, NearbyEntityListener listener, ChunkSectionPos newLocation) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Adding Entity listener a second time: ").append(listener.toString());
-        builder.append("\n");
-        builder.append(" wants to listen at: ").append(newLocation.toString());
-        builder.append(" with cube radius: ").append(listener.getChunkRange());
-        builder.append("\n");
-        builder.append(" but was already listening at chunk sections: ");
-        String[] comma = new String[]{""};
+    private static void errorMessageAlreadyListening(Reference2ReferenceOpenHashMap<NearbyEntityListener, List<TrackedEntityList>> sectionsByEntity, NearbyEntityListener listener, ChunkSectionPos newLocation) {
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Adding Entity listener a second time: ").append(listener.toString());
+        messageBuilder.append("\n");
+        messageBuilder.append(" wants to listen at: ").append(newLocation.toString());
+        messageBuilder.append(" with cube radius: ").append(listener.getChunkRange());
+        messageBuilder.append("\n");
+        messageBuilder.append(" but was already listening at chunk sections: ");
         if (sectionsByEntity.get(listener) == null) {
-            builder.append("null");
+            messageBuilder.append("null");
         } else {
-            sectionsByEntity.get(listener).forEach(a -> {
-                builder.append(comma[0]);
-                builder.append(decode(a.key).toString());
-                comma[0] = ", ";
-            });
+            messageBuilder.append(sectionsByEntity.get(listener).stream().map(trackedEntityList -> decode(trackedEntityList.key).toString()).collect(Collectors.joining(",")));
         }
-        return builder.toString();
+        throw new IllegalStateException(messageBuilder.toString());
     }
+
+
+    private static void errorDoubleAdd(LivingEntity entity, int x, int y, int z, ChunkSectionPos oldPos) {
+        String message = "Adding Entity a second time: " + entityToErrorString(entity) +
+                "\n" +
+                "at chunk pos: " + ChunkSectionPos.from(x, y, z).toString() +
+                "\n" +
+                "but already added at: " + oldPos.toString();
+        throw new IllegalStateException(message);
+    }
+    private static void errorWrongRemove(LivingEntity entity, int x, int y, int z) {
+        String message = "Removing Entity: " + entityToErrorString(entity) +
+                "\n" +
+                "at chunk pos: " + ChunkSectionPos.from(x, y, z).toString() +
+                "\n" +
+                "but wasn't registered there! ";
+        throw new IllegalStateException(message);
+    }
+
+    private static String entityToErrorString(Entity entity) {
+        return entity.toString() + " with NBT: " + entity.toTag(new CompoundTag());
+    }
+
 }

@@ -241,7 +241,7 @@ public class EntityTrackerEngine {
 
             final boolean addSuccess = this.entities.add(entity);
             if(!addSuccess) {
-
+                throw new IllegalStateException("Added entity twice : " + entityToErrorString(entity));
             }
             return addSuccess;
         }
@@ -255,6 +255,8 @@ public class EntityTrackerEngine {
                 }
 
                 this.checkEmpty();
+            } else {
+                throw new IllegalStateException("Removing entity which wasn't added : " + entityToErrorString(entity));
             }
 
             return ret;

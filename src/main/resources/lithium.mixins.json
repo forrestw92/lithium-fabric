@@ -7,15 +7,18 @@
         "defaultRequire": 1
     },
     "client": [
-        "ai.nearby_entity_tracking.MixinClientWorld"
+        "ai.nearby_entity_tracking.exact_position_listening.MixinClientWorld"
     ],
     "mixins": [
         "ai.goal.GoalSelectorMixin",
         "ai.nearby_entity_tracking.LivingEntityMixin",
-        "ai.nearby_entity_tracking.MixinServerWorld",
         "ai.nearby_entity_tracking.ServerWorldMixin",
         "ai.nearby_entity_tracking.WorldChunkMixin",
         "ai.nearby_entity_tracking.WorldMixin",
+        "ai.nearby_entity_tracking.exact_position_listening.MixinEntity",
+        "ai.nearby_entity_tracking.exact_position_listening.MixinServerWorld",
+        "ai.nearby_entity_tracking.exact_position_listening.MixinTeleportCommand",
+        "ai.nearby_entity_tracking.exact_position_listening.ServerPlayNetworkHandlerMixin",
         "ai.nearby_entity_tracking.goals.FleeEntityGoalMixin",
         "ai.nearby_entity_tracking.goals.LookAtGoalMixin",
         "ai.pathing.ChunkCacheMixin",

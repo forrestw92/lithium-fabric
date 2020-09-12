@@ -41,32 +41,6 @@ public class EntityTrackerEngine {
     }
 
     /**
-     * Called before an entity was teleported.
-     * Makes ExactPositionListeners possible.
-     * @author 2No2Name
-     */
-    public void beforeEntityTeleport(Entity entity) {
-        int x = MathHelper.floor(entity.getX()) >> 4;
-        int y = MathHelper.floor(entity.getY()) >> 4;
-        int z = MathHelper.floor(entity.getZ()) >> 4;
-
-        this.removeEntity(x, y, z, entity);
-    }
-
-    /**
-     * Called after an entity was teleported.
-     * Makes ExactPositionListeners possible.
-     * @author 2No2Name
-     */
-    public void afterEntityTeleport(Entity entity) {
-        int x = MathHelper.floor(entity.getX()) >> 4;
-        int y = MathHelper.floor(entity.getY()) >> 4;
-        int z = MathHelper.floor(entity.getZ()) >> 4;
-
-        this.addEntity(x, y, z, entity);
-    }
-
-    /**
      * Called when an entity is removed from the world.
      */
     public void onEntityRemoved(int x, int y, int z, Entity entity) {

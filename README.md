@@ -1,21 +1,14 @@
 ![Project icon](https://git-assets.jellysquid.me/hotlink-ok/lithium/icon-rounded-128px.png)
 
-# Lithium (for Fabric)
-![GitHub license](https://img.shields.io/github/license/jellysquid3/lithium-fabric.svg)
-![GitHub issues](https://img.shields.io/github/issues/jellysquid3/lithium-fabric.svg)
-![GitHub tag](https://img.shields.io/github/tag/jellysquid3/lithium-fabric.svg)
-[![Discord chat](https://img.shields.io/badge/chat%20on-discord-7289DA)](https://jellysquid.me/discord)
-[![CurseForge downloads](http://cf.way2muchnoise.eu/full_360438_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/lithium)
+# Lithium (for Fabric) - Fork for HopperOptimizations
 
 Lithium is a free and open-source Minecraft mod which works to optimize many areas of the game in order to provide
 better overall performance. It works on both the **client and server**, and **doesn't require the mod to be installed
-on both sides**.
+on both sides**. The original project can be fround at https://github.com/jellysquid3/lithium-fabric.
 
 ### Downloads
 
-You can find downloads for Lithium on either the [official CurseForge page](https://www.curseforge.com/minecraft/mc-mods/lithium)
-or through the [GitHub releases page](https://github.com/jellysquid3/lithium-fabric/releases). Usually, builds will be
-made available on GitHub slightly sooner than other locations.
+You can find downloads for Lithium on the [GitHub releases page](https://github.com/2No2Name/lithium-fabric/releases).
 
 ### Installation instructions
 
@@ -25,8 +18,8 @@ Once you have installed Fabric, place the Lithium .jar in the `mods` folder gene
 
 ### Community
 
-If you'd like to get help with the mod, check out the latest developments, or be notified when there's a new release,
-the Discord community might be for you! You can join the official server for my mods by clicking
+If you'd like to check out the latest developments, the Discord community might be for you!
+You can join the base project's server for Jelly's mods by clicking
 [here](https://jellysquid.me/discord).
 
 ---
@@ -39,7 +32,7 @@ solution for those wanting to speed up their game, and as such, installing Lithi
 to the player.
 
 If you do encounter an issue where Lithium deviates from the norm, please don't hesitate to
-[open an issue.](https://github.com/jellysquid3/lithium-fabric/issues) Each patch is carefully checked to ensure
+[open an issue.](https://github.com/2No2Name/lithium-fabric/issues) Each patch might be carefully checked to ensure
 vanilla parity, but after all, bugs are unavoidable.
 
 ### Configuration

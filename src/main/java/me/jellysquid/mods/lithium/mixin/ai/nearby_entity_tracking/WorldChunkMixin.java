@@ -26,15 +26,12 @@ public class WorldChunkMixin {
 
     @Inject(method = "addEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/TypeFilterableList;add(Ljava/lang/Object;)Z"))
     private void onEntityAdded(Entity entity, CallbackInfo ci) {
-        if (entity instanceof LivingEntity) {
-            EntityTrackerEngineProvider.getEntityTracker(this.world).onEntityAdded(entity.chunkX, entity.chunkY, entity.chunkZ, (LivingEntity) entity);
-        }
+        EntityTrackerEngineProvider.getEntityTracker(this.world).onEntityAdded(entity.chunkX, entity.chunkY, entity.chunkZ, entity);
+
     }
 
     @Inject(method = "remove(Lnet/minecraft/entity/Entity;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/TypeFilterableList;remove(Ljava/lang/Object;)Z"))
     private void onEntityRemoved(Entity entity, int section, CallbackInfo ci) {
-        if (entity instanceof LivingEntity) {
-            EntityTrackerEngineProvider.getEntityTracker(this.world).onEntityRemoved(this.pos.x, section, this.pos.z, (LivingEntity) entity);
-        }
+        EntityTrackerEngineProvider.getEntityTracker(this.world).onEntityRemoved(this.pos.x, section, this.pos.z, entity);
     }
 }

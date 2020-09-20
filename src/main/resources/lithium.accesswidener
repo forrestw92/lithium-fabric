@@ -28,3 +28,5 @@ accessible method net/minecraft/world/ChunkPosDistanceLevelPropagator updateLeve
 accessible method net/minecraft/server/world/ChunkTicket isExpired (J)Z
 
 accessible method net/minecraft/util/shape/VoxelShapes findRequiredBitResolution (DD)I
+
+accessible method me/jellysquid/mods/lithium/mixin/world/block_entity_ticking/WorldMixin getPendingBlockEntity (Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/entity/BlockEntity
